@@ -1,0 +1,246 @@
+#!/bin/bash
+
+
+#####################################################
+#####################################################
+##########   Script auto convert video      #########
+##########   Powered by dan Compiling.ru    #########
+##########   http://compiling.ru            #########
+##########				    #########
+#####################################################
+#####################################################
+
+PIDFILE=/var/run/autovideo.pid
+BN=autovideo
+
+
+### Path ###
+path_source='/home/content-source/video/'
+path_trailer='/home/content-source/trailer/'
+path_reklama='/home/content-source/reklama/'
+path_shop='/home/content-source/shop/'
+path_processing='/home/dan/autovideo/'
+
+
+autoconvert()
+{
+
+echo "start autoconvert" >> /home/dan/autovideo/processing.log
+
+##### Start chikl   #########
+echo `date` "  Start sript - while  " >> /home/dan/autovideo/processing.log
+while true; do
+
+
+##### Part 1. Get source simple video   #####
+#in1=`ls  $path_source | head -n 1`
+#echo " y nas est' file:" $in1
+#in1=`ls -lt $path_source | tail -n 1 | awk '{print $9}'` ## name samogo starogo file
+
+in1=`ls -t $path_source | tail -n 1` ## name samogo starogo file
+
+#### Proveraem nalichie file  ######
+if [ -n "$in1" ]; then
+echo "file est'!" $in1  >> /home/dan/autovideo/processing.log
+
+#### proverka timeout file - "date - time_modif_file >= 1"
+rasnicha=$((`date +%Y%j%H%M` - `date +%Y%j%H%M  --reference=$path_source$in1`))
+echo rasnicha simple video $rasnicha >> /home/dan/autovideo/processing.log
+
+	if [ $rasnicha -gt 10 ]; then  ##esli dostatochno starui
+
+##### Part 2. Start convert simple video     #####
+######################################
+echo `date` "  Start convert simple video" >> /home/dan/autovideo/processing.log
+
+mv $path_source$in1 $path_processing$in1-video
+/home/dan/autovideo/video-s.sh $path_processing$in1-video
+
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in1"sd.mp4  193.169.178.29:/home/content/video/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in1"hd720.mp4  193.169.178.29:/home/content/video/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in1"hd1080.mp4  193.169.178.29:/home/content/video/"
+
+mv "$path_processing$in1"-videosd.mp4 /home/content/video/"$in1"sd.mp4
+mv "$path_processing$in1"-videohd720.mp4 /home/content/video/"$in1"hd720.mp4
+mv "$path_processing$in1"-videohd1080.mp4 /home/content/video/"$in1"hd1080.mp4
+mv "$path_processing$in1"-video /shd/old-video/"$in1"
+
+
+
+echo `date` "  End convert simple video" >> /home/dan/autovideo/processing.log
+
+	fi # esli dostatochno starui - end
+
+fi	##   nalichie file - end  video
+
+
+##### Part 3. Get source trailer video   #####
+######################################
+
+in2=`ls -t $path_trailer | tail -n 1`
+echo " y nas est' trailer file:" $in2
+
+#### Proveraem nalichie file  ######
+
+if [ -n "$in2" ]; then
+echo "file triler est'!"
+echo "file triler est'!" $in2  >> /home/dan/autovideo/processing.log
+
+#### proverka timeout file - "date - time_modif_file >= 1"
+rasnicha2=$((`date +%Y%j%H%M` - `date +%Y%j%H%M  --reference=$path_trailer$in2`))
+echo rasnicha2 tra $rasnicha2 >> /home/dan/autovideo/processing.log
+	if [ $rasnicha2 -gt 100 ]; then  ##esli dostatochno starui
+
+
+
+##### Part 4. Start convert trailer video     #####
+###################################################
+echo `date` "  Start convert trailer video" >> /home/dan/autovideo/processing.log
+
+mv $path_trailer$in2 $path_processing$in2-trailer
+/home/dan/autovideo/trailer.sh $path_processing$in2-trailer
+
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in2"sd.mp4  193.169.178.29:/home/content/trailer/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in2"hd720.mp4  193.169.178.29:/home/content/trailer/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in2"hd1080.mp4  193.169.178.29:/home/content/trailer/"
+
+mv "$path_processing$in2"-trailersd.mp4 /home/content/trailer/"$in2"sd.mp4
+mv "$path_processing$in2"-trailerhd720.mp4 /home/content/trailer/"$in2"hd720.mp4
+mv "$path_processing$in2"-trailerhd1080.mp4 /home/content/trailer/"$in2"hd1080.mp4
+mv "$path_processing$in2"-trailer /shd/old-trailer/"$in2"
+echo `date` "  End convert trailer video" >> /home/dan/autovideo/processing.log
+
+	fi # esli dostatochno starui - end
+fi  ## nalichie file - end  trailer
+
+
+
+##### Part 5. Get source reklama video   #####
+######################################
+
+in3=`ls -t $path_reklama | tail -n 1`
+echo " y nas est' reklama file:" $in3
+
+#### Proveraem nalichie file  ######
+
+if [ -n "$in3" ]; then
+echo "file reklama est'!"
+echo "file reklama est'!" $in3  >> /home/dan/autovideo/processing.log
+
+#### proverka timeout file - "date - time_modif_file >= 1"
+rasnicha3=$((`date +%Y%j%H%M` - `date +%Y%j%H%M  --reference=$path_reklama$in3`))
+echo rasnicha3 reklama $rasnicha3 >> /home/dan/autovideo/processing.log
+        if [ $rasnicha3 -gt 100 ]; then  ##esli dostatochno starui
+
+
+##### Part 6. Start convert reklama video     #####
+###################################################
+echo `date` "  Start convert reklama video" >> /home/dan/autovideo/processing.log
+
+mv $path_reklama$in3 $path_processing$in3
+/home/dan/autovideo/video-s.sh $path_processing$in3
+
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in3"sd.mp4  193.169.178.29:/home/content/reklama/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in3"hd720.mp4  193.169.178.29:/home/content/reklama/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in3"hd1080.mp4  193.169.178.29:/home/content/reklama/"
+
+mv "$path_processing$in3"sd.mp4 /home/content/reklama/
+mv "$path_processing$in3"hd720.mp4 /home/content/reklama/
+mv "$path_processing$in3"hd1080.mp4 /home/content/reklama/
+mv "$path_processing$in3" /shd/old-reklama/
+echo `date` "  End convert reklama video" >> /home/dan/autovideo/processing.log
+
+        fi # esli dostatochno starui - end
+fi  ## nalichie file - end  reklama
+
+
+
+
+##### Part 7. Get source shop video   #####
+######################################
+
+in4=`ls -t $path_shop | tail -n 1`
+echo " y nas est' shop file:" $in4
+
+#### Proveraem nalichie file  ######
+
+if [ -n "$in4" ]; then
+echo "file shop est'!"
+echo "file shop est'!" $in4  >> /home/dan/autovideo/processing.log
+
+#### proverka timeout file - "date - time_modif_file >= 1"
+rasnicha4=$((`date +%Y%j%H%M` - `date +%Y%j%H%M  --reference=$path_shop$in4`))
+echo rasnicha4 shop $rasnicha4 >> /home/dan/autovideo/processing.log
+        if [ $rasnicha4 -gt 100 ]; then  ##esli dostatochno starui
+
+
+##### Part 8. Start convert shop video     #####
+###################################################
+echo `date` "  Start convert shop video" >> /home/dan/autovideo/processing.log
+
+mv $path_shop$in4 $path_processing$in4
+/home/dan/autovideo/video-s.sh $path_processing$in4
+
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in4"sd.mp4  193.169.178.29:/home/content/shop/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in4"hd720.mp4  193.169.178.29:/home/content/shop/"
+#su ftp-load2 -c "scp -P 53322 "$path_processing$in4"hd1080.mp4  193.169.178.29:/home/content/shop/"
+
+mv "$path_processing$in4"sd.mp4 /home/content/shop/
+mv "$path_processing$in4"hd720.mp4 /home/content/shop/
+mv "$path_processing$in4"hd1080.mp4 /home/content/shop/
+mv "$path_processing$in4" /shd/old-shop/
+echo `date` "  End convert shop video" >> /home/dan/autovideo/processing.log
+
+        fi # esli dostatochno starui - end
+fi  ## nalichie file - end  reklama
+
+
+
+
+
+sleep 10
+
+done
+echo `date` " End sript" >> /home/dan/autovideo/processing.log
+}
+
+do_Start()
+{
+#start1=`cat $PIDFILE`
+#if [ "$start1" -gt "0" ]; then
+#        echo "$BN already started" && return 1
+#else
+
+    echo "Starting $BN"
+    echo `date` "  Start" > /home/dan/autovideo/processing.log
+    autoconvert &
+    echo $! > $PIDFILE
+#fi
+}
+
+do_Stop()
+{
+start1=`cat $PIDFILE`
+if [ "$start1" -gt "0" ]; then
+        echo "Stopping $BN"
+	echo 0 > $PIDFILE
+        kill $start1
+        return 0
+else
+ echo "No $BN started" && return 1
+
+fi
+}
+
+case $1 in
+'start')
+    do_Start
+    ;;
+'stop')
+    do_Stop
+    ;;
+*)
+    echo "Usage: $0 { start | stop }"
+    ;;
+esac
+
